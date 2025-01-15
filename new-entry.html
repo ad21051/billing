@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add New Entry</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    form {
+      max-width: 400px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    input, textarea, button {
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Add New Patient Entry</h1>
+  <form id="newEntryForm">
+    <input type="date" id="date" required>
+    <input type="text" id="patientName" placeholder="Patient Name" required>
+    <input type="text" id="caseId" placeholder="Case ID" required>
+    <textarea id="itemsUsed" placeholder="Enter items used (comma-separated)" required></textarea>
+    <button type="submit">Add Entry</button>
+  </form>
+
+  <script>
+    const form = document.getElementById("newEntryForm");
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const date = document.getElementById("date").value;
+      const patientName = document.getElementById("patientName").value;
+      const caseId = document.getElementById("caseId").value;
+      const itemsUsed = document.getElementById("itemsUsed").value.split(",");
+
+      const newEntry = {
+        date,
+        patientName,
+        caseId,
+        items: itemsUsed,
+        billingStatus: "Pending",
+        billedBy: ""
+      };
+
+      let existingData = JSON.parse(localStorage.getItem("billingData")) || [];
+      existingData.push(newEntry);
+      localStorage.setItem("billingData", JSON.stringify(existingData));
+
+      alert("Entry added successfully!");
+      window.location.href = "billing-tracker.html";
+    });
+  </script>
+</body>
+</html>

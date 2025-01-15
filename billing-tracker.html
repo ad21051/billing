@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Billing Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    button {
+      padding: 5px 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Welcome, <span id="userName"></span>!</h1>
+    <button id="logoutButton">Logout</button>
+    <button onclick="window.location.href='new-entry.html'">Add New Entry</button>
+  </header>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Patient Name</th>
+        <th>Case ID</th>
+        <th>Items Used</th>
+        <th>Billing Status</th>
+        <th>Billed By</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="billingTableBody"></tbody>
+  </table>
+
+  <script>
+    const loggedInUser = localStorage.getItem("loggedInUser");
+    if (!loggedInUser) {
+      alert("You need to log in first!");
+      window.location.href = "login.html";
+    }
+    document.getElementById("userName").textContent = loggedInUser;
+
+    const billingData = JSON.parse(localStorage.getItem("billingData")) || [];
+    const tableBody = document.getElementById("billingTableBody");
+
+    function renderTable() {
+      tableBody.innerHTML = "";
+      billingData.forEach((entry, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${entry.date}</td>
+          <td>${entry.patientName}</td>
+          <td>${entry.caseId}</td>
+          <td>${entry.items.join(", ")}</td>
+          <td>${entry.billingStatus}</td>
+          <td>${entry.billedBy || "N/A"}</td>
+          <td>
+            ${
+              entry.billingStatus === "Pending"
+                ? `<button onclick="markAsBilled(${index})">Mark as Billed</button>`
+                : "Billed"
+            }
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function markAsBilled(index) {
+      billingData[index].billingStatus = "Billed";
+      billingData[index].billedBy = loggedInUser;
+      localStorage.setItem("billingData", JSON.stringify(billingData));
+      renderTable();
+    }
+
+    document.getElementById("logoutButton").addEventListener("click", () => {
+      localStorage.removeItem("loggedInUser");
+      window.location.href = "login.html";
+    });
+
+    renderTable();
+  </script>
+</body>
+</html>
